@@ -9,6 +9,6 @@ module "lambda_function" {
   source_path = "src/post_traffic_test.py"
 
   tags = {
-    Name = "my-lambda1"
+    Name = "${var.cluster_name}"
   }
 }

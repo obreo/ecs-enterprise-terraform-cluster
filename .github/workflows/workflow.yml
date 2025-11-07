@@ -42,7 +42,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        run: terraform -chdir=Base/ init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
+        run: terraform -chdir=Base/ init -backend-config=../${{env.BACKEND}} -var-file="../${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Validate
         run: terraform -chdir=Base/ validate
@@ -54,7 +54,7 @@ jobs:
         run: terraform -chdir=Base/ apply -auto-approve "tfplan"
 
       - name: Terraform Init
-        run: terraform -chdir=LifecycleHooks/ init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
+        run: terraform -chdir=LifecycleHooks/ init -backend-config=../${{env.BACKEND}} -var-file="../${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Validate
         run: terraform -chdir=LifecycleHooks/ validate
