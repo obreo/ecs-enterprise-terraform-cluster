@@ -5,11 +5,11 @@
 ################################################################################
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb
 resource "aws_lb" "load_balancer" {
-  name               = "${var.cluster_name}-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [data.terraform_remote_state.vpc.outputs.security_group_ids["alb_sg"]]
-  subnets            = data.terraform_remote_state.vpc.outputs.public_subnet_cidr_blocks
+  name                       = "${var.cluster_name}-alb"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [data.terraform_remote_state.vpc.outputs.security_group_ids["alb_sg"]]
+  subnets                    = data.terraform_remote_state.vpc.outputs.public_subnet_cidr_blocks
   enable_deletion_protection = false
   tags = {
     Environment = "${var.environment}"
@@ -88,7 +88,7 @@ resource "aws_lb" "load_balancer" {
 
 # Frontend
 resource "aws_lb_target_group" "frontend_blue" {
-#   count                = var.disable_autoscaling[0] == "false" && var.include_frontend_ecs_service == true ? 1 : 0
+  #   count                = var.disable_autoscaling[0] == "false" && var.include_frontend_ecs_service == true ? 1 : 0
   name                 = "${var.cluster_name}-${var.environment}-frontend"
   port                 = 80
   protocol             = "HTTP"

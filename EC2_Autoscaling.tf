@@ -23,7 +23,7 @@ module "autoscaling" {
         EOF
       EOT
     }
-    
+
     # Spot instances
     # EC2_Spot = {
     #   instance_type              = "t3.medium"

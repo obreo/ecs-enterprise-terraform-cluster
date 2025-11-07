@@ -4,3 +4,9 @@
 .terraform.tfstate.lock.info
 .terraform.lock.hcl
 tfplan
+*/.terraform
+*/*.tfstate
+*/*.tfstate.*backup
+*/.terraform.tfstate.lock.info
+*/.terraform.lock.hcl
+*/tfplan

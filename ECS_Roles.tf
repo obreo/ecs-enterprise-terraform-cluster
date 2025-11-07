@@ -60,11 +60,11 @@ resource "aws_iam_policy" "custom_ecs_policy" {
         ]
       },
       {
-        Sid = "LambdaInvoke"
+        Sid    = "LambdaInvoke"
         Effect = "Allow"
         Action = [
           "lambda:InvokeFunctionUrl",
-				  "lambda:InvokeFunction"
+          "lambda:InvokeFunction"
         ]
         Resource = "arn:aws:lambda:*:161805785056:function:*"
       }

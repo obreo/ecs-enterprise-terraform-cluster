@@ -53,6 +53,18 @@ jobs:
       - name: Terraform Apply
         run: terraform -chdir=Base/ apply -auto-approve "tfplan"
 
+      - name: Terraform Init
+        run: terraform -chdir=LifecycleHooks/ init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
+
+      - name: Terraform Validate
+        run: terraform -chdir=LifecycleHooks/ validate
+
+      - name: Terraform Plan
+        run: terraform -chdir=LifecycleHooks/ plan -out=tfplan -var-file="../${{env.VARIABLES}}"
+
+      - name: Terraform Apply
+        run: terraform -chdir=LifecycleHooks/ apply -auto-approve "tfplan"
+
   development:
     name: Development
     runs-on: ubuntu-latest

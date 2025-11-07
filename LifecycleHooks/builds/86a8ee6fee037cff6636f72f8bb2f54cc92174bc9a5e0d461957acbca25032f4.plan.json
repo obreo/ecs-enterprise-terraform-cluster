@@ -1,0 +1,1 @@
+{"filename": "builds\\86a8ee6fee037cff6636f72f8bb2f54cc92174bc9a5e0d461957acbca25032f4.zip", "runtime": "python3.12", "artifacts_dir": "builds", "build_plan": [[["zip", "src/post_traffic_test.py", null]]], "quiet": "true"}

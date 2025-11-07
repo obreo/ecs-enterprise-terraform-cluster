@@ -1,24 +1,24 @@
 locals {
-  frontend_container = {"name" = "solarstan-frontend", "port" = 80}
+  frontend_container = { "name" = "solarstan-frontend", "port" = 80 }
 }
 
 module "service_frontend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
 
-  name        = local.frontend_container.name
-  cluster_arn = "${module.ecs_cluster.arn}"
-  iam_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  name                          = local.frontend_container.name
+  cluster_arn                   = module.ecs_cluster.arn
+  iam_role_arn                  = aws_iam_role.ecs_task_execution_role.arn
   availability_zone_rebalancing = "DISABLED"
 
 
-  cpu    = 256
-  memory = 512
-  desired_count = 1
+  cpu                      = 256
+  memory                   = 512
+  desired_count            = 1
   autoscaling_max_capacity = 2
   autoscaling_min_capacity = 1
 
-  deployment_maximum_percent = 200
+  deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
 
   capacity_provider_strategy = {
@@ -45,20 +45,20 @@ module "service_frontend" {
       ]
       healthCheck = {
         command = [
-            "CMD-SHELL",
-            "curl -f http://localhost/ || exit 1"
+          "CMD-SHELL",
+          "curl -f http://localhost/ || exit 1"
         ]
       }
       # Example image used requires access to write to root filesystem
-    #   readonlyRootFilesystem = false
+      #   readonlyRootFilesystem = false
 
-    #   dependsOn = [{
-    #     containerName = ""
-    #     condition     = "START"
-    #   }]
+      #   dependsOn = [{
+      #     containerName = ""
+      #     condition     = "START"
+      #   }]
 
-      readonlyRootFilesystem = false
-      enable_cloudwatch_logging = true
+      readonlyRootFilesystem                 = false
+      enable_cloudwatch_logging              = true
       cloudwatch_log_group_retention_in_days = 7
       logConfiguration = {
         logConfiguration = {
@@ -71,11 +71,11 @@ module "service_frontend" {
         }
       }
       requires_compatibilities = ["EC2"]
-      memoryReservation = 100
+      memoryReservation        = 100
 
       restartPolicy = {
-        enabled = true
-        ignoredExitCodes = [1]
+        enabled              = true
+        ignoredExitCodes     = [1]
         restartAttemptPeriod = 60
       }
     }
@@ -106,27 +106,27 @@ module "service_frontend" {
       }
     }
   }
-  
+
   # This block defines the deployment strategy. For BlueGreen, we can add lifecycle hook. Terraform module and resource pages can help.
   deployment_configuration = {
     strategy             = "BLUE_GREEN"
     bake_time_in_minutes = 1
     lifecycle_hook = {
       "TEST_TRAFFIC_SHIFT" = {
-        hook_target_arn  = string                                         # lambda function
-        role_arn         = "${aws_iam_role.ecs_task_execution_role.arn}"  # invoke lambda role
-        lifecycle_stages = ["TEST_TRAFFIC_SHIFT"]                         # lifecycle hook stage
-        hook_details     = jsonencode({                                   # what should be passed to the lambda event json.
+        hook_target_arn  = data.terraform_remote_state.base.outputs.lambda_post_traffic_arn # lambda function
+        role_arn         = "${aws_iam_role.ecs_task_execution_role.arn}"                    # invoke lambda role
+        lifecycle_stages = ["TEST_TRAFFIC_SHIFT"]                                           # lifecycle hook stage
+        hook_details = jsonencode({                                                         # what should be passed to the lambda event json.
           TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
         })
       }
     }
   }
-  subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
+  subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["frontend_sg"], module.autoscaling_sg.security_group_id]
-  
-  
-  
+
+
+
   # security_group_ingress_rules = {
   #   alb_access = {
   #     description                  = "Service port"
