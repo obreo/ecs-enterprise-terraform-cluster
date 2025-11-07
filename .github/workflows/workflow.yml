@@ -69,6 +69,7 @@ jobs:
     name: Development
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/development'
+    needs: base
 
     env:
       BACKEND: 'environments/staging/backend.tfvars'
