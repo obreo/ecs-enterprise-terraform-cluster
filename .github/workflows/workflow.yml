@@ -61,7 +61,7 @@ jobs:
     env:
       BACKEND: 'environments/staging/backend.tfvars'
       VARIABLES: 'environments/staging/variables.tfvars'
-      REGION: "us-east-1"
+      REGION: ${{vars.REGION}}
 
     steps:
       - name: Checkout repository
@@ -77,7 +77,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        run: terraform init -backend-config=${{env.BACKEND}} -reconfigure
+        run: terraform init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Validate
         run: terraform validate
@@ -98,8 +98,7 @@ jobs:
     env:
       BACKEND: 'environments/staging/backend.tfvars'
       VARIABLES: 'environments/staging/variables.tfvars'
-      REGION: 'us-east-1'
-
+      REGION: ${{vars.REGION}}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -114,7 +113,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        run: terraform init -backend-config=${{env.BACKEND}} -reconfigure
+        run: terraform init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Plan
         run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
@@ -136,7 +135,7 @@ jobs:
     env:
       BACKEND: 'environments/production/backend.tfvars'
       VARIABLES: 'environments/production/variables.tfvars'
-      REGION: 'us-east-1'
+      REGION: ${{ vars.REGION }}
 
     steps:
       - name: Checkout repository
@@ -152,7 +151,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        run: terraform init -backend-config=${{env.BACKEND}} -reconfigure
+        run: terraform init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Plan
         run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
