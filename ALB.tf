@@ -89,7 +89,7 @@ resource "aws_lb" "load_balancer" {
 # Frontend
 resource "aws_lb_target_group" "frontend_blue" {
   #   count                = var.disable_autoscaling[0] == "false" && var.include_frontend_ecs_service == true ? 1 : 0
-  name                 = "${var.cluster_name}-${var.environment}-frontend"
+  name                 = "${var.cluster_name}-${var.environment}"
   port                 = 80
   protocol             = "HTTP"
   target_type          = "ip"
@@ -114,6 +114,7 @@ resource "aws_lb_target_group" "frontend_blue" {
 
   tags = {
     "Environment" = "${var.environment}"
+    "Tier" = "Frontend"
   }
 
   depends_on = [
@@ -122,7 +123,7 @@ resource "aws_lb_target_group" "frontend_blue" {
 }
 
 resource "aws_lb_target_group" "frontend_green" {
-  name                 = "${var.cluster_name}-${var.environment}-frontend-alt"
+  name                 = "${var.cluster_name}-${var.environment}-alt"
   port                 = 8080
   protocol             = "HTTP"
   target_type          = "ip"
@@ -143,6 +144,11 @@ resource "aws_lb_target_group" "frontend_green" {
     enabled         = true
     cookie_duration = 86400 # Seconds = 1 Day
     type            = "lb_cookie"
+  }
+
+  tags = {
+    "Environment" = "${var.environment}"
+    "Tier" = "Frontend"
   }
 
   depends_on = [
