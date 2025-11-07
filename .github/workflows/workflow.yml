@@ -26,7 +26,7 @@ jobs:
     env:
       BACKEND: 'environments/base/backend.tfvars'
       VARIABLES: 'environments/base/variables.tfvars'
-      REGION: 'us-east-1'
+      REGION: ${{vars.REGION}}
 
     steps:
       - name: Checkout repository
@@ -42,7 +42,7 @@ jobs:
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
-        run: terraform -chdir=Base/ init -backend-config=${{env.BACKEND}} -reconfigure
+        run: terraform -chdir=Base/ init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Validate
         run: terraform -chidr=Base/ validate
