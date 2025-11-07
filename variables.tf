@@ -53,7 +53,7 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-variable "terraform_remote_outputs_ecs" {
+variable "terraform_remote_outputs_base" {
   description = "Terraform remote state outputs configuration"
   type = object({
     s3_bucket = string
