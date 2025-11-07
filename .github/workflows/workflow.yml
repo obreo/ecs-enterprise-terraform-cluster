@@ -45,7 +45,7 @@ jobs:
         run: terraform -chdir=Base/ init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Validate
-        run: terraform -chidr=Base/ validate
+        run: terraform -chdir=Base/ validate
 
       - name: Terraform Plan
         run: terraform -chdir=Base/ plan -out=tfplan -backend-config=${{env.BACKEND}} -var-file=${{env.VARIABLES}}
