@@ -114,7 +114,7 @@ resource "aws_lb_target_group" "frontend_blue" {
 
   tags = {
     "Environment" = "${var.environment}"
-    "Tier" = "Frontend"
+    "Tier"        = "Frontend"
   }
 
   depends_on = [
@@ -148,7 +148,7 @@ resource "aws_lb_target_group" "frontend_green" {
 
   tags = {
     "Environment" = "${var.environment}"
-    "Tier" = "Frontend"
+    "Tier"        = "Frontend"
   }
 
   depends_on = [

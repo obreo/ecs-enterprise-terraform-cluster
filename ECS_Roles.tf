@@ -1,4 +1,29 @@
 ######################################################
+# Default ECS service role
+# Only if you enable load_balancer block
+######################################################
+resource "aws_iam_role" "ecs_service_role" {
+  name = "ecs_service_role_${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs.amazonaws.com" # Note: ecs.amazonaws.com, NOT ecs-tasks
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_service_role_policy" {
+  role       = aws_iam_role.ecs_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+}
+
+
+######################################################
 # Task Execution Role
 # This is given to ECS to get the image and write logs in cloudwatch - role is executed on the task definition level.
 ######################################################
