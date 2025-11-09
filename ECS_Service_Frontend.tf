@@ -11,6 +11,7 @@ module "service_frontend" {
   iam_role_arn                  = aws_iam_role.ecs_service_role.arn
   task_exec_iam_role_arn        = aws_iam_role.ecs_task_execution_role.arn
   tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
+  
   enable_execute_command        = true
   availability_zone_rebalancing = "DISABLED"
 
