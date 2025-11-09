@@ -32,7 +32,6 @@ module "service_backend" {
   }
 
 
-  # Container definition(s)
   container_definitions = {
     "${local.backend_container.name}" = {
       cpu       = 256
@@ -53,27 +52,10 @@ module "service_backend" {
         ]
       }
 
-      # Example image used requires access to write to root filesystem
-      #   readonlyRootFilesystem = false
-
-      #   dependsOn = [{
-      #     containerName = ""
-      #     condition     = "START"
-      #   }]
-
       readonlyRootFilesystem                 = false
       enable_cloudwatch_logging              = true
       cloudwatch_log_group_retention_in_days = 7
-      logConfiguration = {
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = "/aws/ecs"
-            awslogs-region        = "us-east-1"
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-      }
+
 
       memoryReservation = 100
       restartPolicy = {
@@ -100,6 +82,24 @@ module "service_backend" {
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["backend_sg"]]
 
+  tags = {
+    Environment = "${var.environment}"
+  }
+}
+
+# ADDITIONAL TASK DEFINITION CONFIGS
+
+  # logConfiguration = {
+  #   logConfiguration = {
+  #     logDriver = "awslogs"
+  #     options = {
+  #       awslogs-group         = "/aws/ecs"
+  #       awslogs-region        = "us-east-1"
+  #       awslogs-stream-prefix = "ecs"
+  #     }
+  #   }
+  # }
+  
   # load_balancer = {
   #   service = {
   #     target_group_arn = ""
@@ -123,10 +123,3 @@ module "service_backend" {
   #     cidr_ipv4   = "0.0.0.0/0"
   #   }
   # }
-
-  tags = {
-    Environment = "${var.environment}"
-  }
-}
-
-

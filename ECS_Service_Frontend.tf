@@ -33,7 +33,6 @@ module "service_frontend" {
     }
   }
 
-  # Container definition(s)
   container_definitions = {
     "${local.frontend_container.name}" = {
       cpu       = 256
@@ -53,30 +52,13 @@ module "service_frontend" {
           "curl -f http://localhost/ || exit 1"
         ]
       }
-      # Example image used requires access to write to root filesystem
-      #   readonlyRootFilesystem = false
-
-      #   dependsOn = [{
-      #     containerName = ""
-      #     condition     = "START"
-      #   }]
 
       readonlyRootFilesystem                 = false
       enable_cloudwatch_logging              = true
       cloudwatch_log_group_retention_in_days = 7
-      logConfiguration = {
-        logConfiguration = {
-          logDriver = "awslogs"
-          options = {
-            awslogs-group         = "/aws/ecs"
-            awslogs-region        = "us-east-1"
-            awslogs-stream-prefix = "ecs"
-          }
-        }
-      }
+
       
       memoryReservation        = 100
-
       restartPolicy = {
         enabled              = true
         ignoredExitCodes     = [1]
@@ -92,7 +74,7 @@ module "service_frontend" {
         port     = local.frontend_container.port
         dns_name = "${local.frontend_container.name}"
       }
-      port_name      = "http" # Maps to the container port name
+      port_name      = "http"
       discovery_name = "${local.frontend_container.name}"
     }]
   }
@@ -111,7 +93,6 @@ module "service_frontend" {
     }
   }
 
-  # This block defines the deployment strategy. For BlueGreen, we can add lifecycle hook. Terraform module and resource pages can help.
   deployment_configuration = {
     strategy             = "BLUE_GREEN"
     bake_time_in_minutes = 1
@@ -129,7 +110,24 @@ module "service_frontend" {
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["frontend_sg"], module.autoscaling_sg.security_group_id]
 
+  tags = {
+    Environment = "${var.environment}"
+  }
+}
 
+
+# ADDITIONAL TASK DEFINITION CONFIGS
+
+  # logConfiguration = {
+  #   logConfiguration = {
+  #     logDriver = "awslogs"
+  #     options = {
+  #       awslogs-group         = "/aws/ecs"
+  #       awslogs-region        = "us-east-1"
+  #       awslogs-stream-prefix = "ecs"
+  #     }
+  #   }
+  # }
 
   # security_group_ingress_rules = {
   #   alb_access = {
@@ -145,10 +143,3 @@ module "service_frontend" {
   #     cidr_ipv4   = "0.0.0.0/0"
   #   }
   # }
-
-  tags = {
-    Environment = "${var.environment}"
-  }
-}
-
-
