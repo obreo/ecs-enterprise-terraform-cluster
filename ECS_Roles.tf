@@ -55,11 +55,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
 #   role       = aws_iam_role.ecs_task_execution_role.name
 #   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 # }
-# ECS Full Access
-resource "aws_iam_role_policy_attachment" "ecs_full_access" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
-}
+
+
 # To get parameters from SSM - if needed
 resource "aws_iam_role_policy_attachment" "ssm" {
   role       = aws_iam_role.ecs_task_execution_role.name
