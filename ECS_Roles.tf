@@ -1,26 +1,26 @@
 ######################################################
-# Default ECS service role
+# Default ECS service role for EC2
 # Only if you enable load_balancer block
 ######################################################
-resource "aws_iam_role" "ecs_service_role" {
-  name = "ecs_service_role_${var.environment}"
+# resource "aws_iam_role" "ecs_service_role" {
+#   name = "ecs_service_role_${var.environment}"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ecs.amazonaws.com" # Note: ecs.amazonaws.com, NOT ecs-tasks
-      }
-    }]
-  })
-}
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Action = "sts:AssumeRole"
+#       Effect = "Allow"
+#       Principal = {
+#         Service = "ecs.amazonaws.com" # Note: ecs.amazonaws.com, NOT ecs-tasks
+#       }
+#     }]
+#   })
+# }
 
-resource "aws_iam_role_policy_attachment" "ecs_service_role_policy" {
-  role       = aws_iam_role.ecs_service_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
-}
+# resource "aws_iam_role_policy_attachment" "ecs_service_role_policy" {
+#   role       = aws_iam_role.ecs_service_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+# }
 
 
 ######################################################

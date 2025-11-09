@@ -72,7 +72,7 @@ module "autoscaling" {
   ignore_desired_capacity_changes = true
 
   create_iam_instance_profile = true
-  iam_role_name               = "${var.cluster_name}-${var.environment}"
+  iam_role_name               = "EC2-${var.cluster_name}-${var.environment}"
   iam_role_description        = "ECS role for ${var.cluster_name}"
   iam_role_policies = {
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
