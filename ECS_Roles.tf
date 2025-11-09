@@ -21,7 +21,30 @@ resource "aws_iam_role_policy_attachment" "ecs_service_role_policy" {
   role       = aws_iam_role.ecs_service_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
 }
+resource "aws_iam_role_policy_attachment" "lambda_trigger" {
+  role       = aws_iam_role.ecs_service_role.name
+  policy_arn = aws_iam_policy.lambda_trigger.arn
+}
+resource "aws_iam_policy" "lambda_trigger" {
+  name        = "lambda_trigger_${var.environment}"
+  path        = "/"
+  description = "Additional policies given to ECS task and task execution"
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "LambdaInvoke"
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Resource = "arn:aws:lambda:*:161805785056:function:*"
+      }
+    ]
+  })
 
+}
 
 ######################################################
 # Task Execution Role
@@ -78,15 +101,6 @@ resource "aws_iam_policy" "custom_ecs_policy" {
         Resource = [
           "arn:aws:s3:::${var.secrets_s3_bucket.enable_secrets_bucket ? var.secrets_s3_bucket.bucket_name : "no-bucket"}/secrets/*",
         ]
-      },
-      {
-        Sid    = "LambdaInvoke"
-        Effect = "Allow"
-        Action = [
-          "lambda:InvokeFunctionUrl",
-          "lambda:InvokeFunction"
-        ]
-        Resource = "arn:aws:lambda:*:161805785056:function:*"
       }
     ]
   })
