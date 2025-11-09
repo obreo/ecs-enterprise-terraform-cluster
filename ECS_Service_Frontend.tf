@@ -8,7 +8,7 @@ module "service_frontend" {
 
   name                          = local.frontend_container.name
   cluster_arn                   = module.ecs_cluster.arn
-  # iam_role_arn                  = aws_iam_role.ecs_service_role.arn
+  iam_role_arn                  = aws_iam_role.ecs_service_role.arn
   task_exec_iam_role_arn        = aws_iam_role.ecs_task_execution_role.arn
   tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
 
@@ -24,7 +24,7 @@ module "service_frontend" {
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-
+  requires_compatibilities = ["EC2"]
   capacity_provider_strategy = {
     EC2 = {
       capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["EC2"].name
@@ -74,7 +74,7 @@ module "service_frontend" {
           }
         }
       }
-      requires_compatibilities = ["EC2"]
+      
       memoryReservation        = 100
 
       restartPolicy = {

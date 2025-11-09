@@ -8,7 +8,7 @@ module "service_backend" {
 
   name                          = local.backend_container.name
   cluster_arn                   = module.ecs_cluster.arn
-  # iam_role_arn                  = aws_iam_role.ecs_service_role.arn
+  iam_role_arn                  = aws_iam_role.ecs_service_role.arn
   task_exec_iam_role_arn        = aws_iam_role.ecs_task_execution_role.arn
   tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
   enable_execute_command        = true
@@ -22,7 +22,7 @@ module "service_backend" {
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-
+  requires_compatibilities = ["EC2"]
   capacity_provider_strategy = {
     EC2 = {
       capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["EC2"].name
@@ -84,7 +84,7 @@ module "service_backend" {
     }
   }
 
-  requires_compatibilities = ["EC2"]
+  
   service_connect_configuration = {
     namespace = "${aws_service_discovery_http_namespace.namespace.name}"
     service = [{

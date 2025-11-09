@@ -2,25 +2,25 @@
 # Default ECS service role for EC2
 # Only if you enable load_balancer block
 ######################################################
-# resource "aws_iam_role" "ecs_service_role" {
-#   name = "ecs_service_role_${var.environment}"
+resource "aws_iam_role" "ecs_service_role" {
+  name = "ecs_service_role_${var.environment}"
 
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [{
-#       Action = "sts:AssumeRole"
-#       Effect = "Allow"
-#       Principal = {
-#         Service = "ecs.amazonaws.com" # Note: ecs.amazonaws.com, NOT ecs-tasks
-#       }
-#     }]
-#   })
-# }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ecs.amazonaws.com" # Note: ecs.amazonaws.com, NOT ecs-tasks
+      }
+    }]
+  })
+}
 
-# resource "aws_iam_role_policy_attachment" "ecs_service_role_policy" {
-#   role       = aws_iam_role.ecs_service_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
-# }
+resource "aws_iam_role_policy_attachment" "ecs_service_role_policy" {
+  role       = aws_iam_role.ecs_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
+}
 
 
 ######################################################
@@ -50,17 +50,6 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-# resource "aws_iam_role_policy_attachment" "ecs_service_role_policyy" {
-#   role       = aws_iam_role.ecs_task_execution_role.name
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceRole"
-# }
-
-
-# To get parameters from SSM - if needed
-resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
 }
 # To create EBS volume- if needed
 resource "aws_iam_role_policy_attachment" "ebs" {
@@ -132,6 +121,10 @@ resource "aws_iam_role_policy_attachment" "custom_ecs_policy_task_role" {
   policy_arn = aws_iam_policy.custom_ecs_policy.arn
 }
 
+output "debug_task_exec_role_arn" {
+  value = aws_iam_role.ecs_task_execution_role.arn
+}
 
-
-
+output "debug_task_role_arn" {
+  value = aws_iam_role.ecs_task_role.arn
+}
