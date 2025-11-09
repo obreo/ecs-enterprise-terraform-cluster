@@ -28,8 +28,8 @@ variable "loadbalancer" {
 variable "secrets_s3_bucket" {
   description = "S3 bucket for secrets fetching"
   type = object({
-    enable_secrets_bucket = bool
-    bucket_name           = string
+    enable_secrets_bucket = optional(bool, false)
+    bucket_name           = optional(string, "")
   })
 }
 
