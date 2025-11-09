@@ -20,5 +20,5 @@ loadbalancer = {
 
 secrets_s3_bucket = {
     enable_secrets_bucket = false
-    bucket_name = ""
+    bucket_name = "None"
 }
