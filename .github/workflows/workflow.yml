@@ -73,7 +73,7 @@ jobs:
 
     env:
       BACKEND: 'environments/production/backend.tfvars'
-      VARIABLES: 'environments/prodction/variables.tfvars'
+      VARIABLES: 'environments/production/variables.tfvars'
       REGION: ${{vars.REGION}}
 
     steps:
