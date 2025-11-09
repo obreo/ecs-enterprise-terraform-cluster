@@ -1,7 +1,7 @@
 cluster_name = "ecs-enterprise"
 environment = "production"
 
-# domain =
+domain = "abralabs.com"
 
 terraform_remote_outputs_vpc = {
     s3_bucket     = "abra-terraform-states"
@@ -20,5 +20,5 @@ loadbalancer = {
 
 secrets_s3_bucket = {
     enable_secrets_bucket = false
-    bucket_name = string
+    bucket_name = ""
 }

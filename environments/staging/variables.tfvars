@@ -1,7 +1,7 @@
 cluster_name = "ecs-enterprise"
 environment = "staging"
 
-domain = "abralabs.com"
+domain = "staging.abralabs.com"
 
 terraform_remote_outputs_vpc = {
     s3_bucket     = "abra-terraform-states"

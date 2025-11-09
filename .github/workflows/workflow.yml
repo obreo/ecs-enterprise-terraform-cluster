@@ -72,8 +72,8 @@ jobs:
     needs: base
 
     env:
-      BACKEND: 'environments/staging/backend.tfvars'
-      VARIABLES: 'environments/staging/variables.tfvars'
+      BACKEND: 'environments/production/backend.tfvars'
+      VARIABLES: 'environments/prodction/variables.tfvars'
       REGION: ${{vars.REGION}}
 
     steps:
