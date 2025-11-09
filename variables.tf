@@ -29,7 +29,7 @@ variable "secrets_s3_bucket" {
   description = "S3 bucket for secrets fetching"
   type = object({
     enable_secrets_bucket = bool
-    bucket                = string
+    bucket_name                = string
   })
 }
 
