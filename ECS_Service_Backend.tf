@@ -80,8 +80,6 @@ module "service_backend" {
         restartAttemptPeriod = 60
       }
     }
-
-
   }
 
   requires_compatibilities = ["EC2"]
@@ -97,6 +95,9 @@ module "service_backend" {
     }]
   }
 
+  subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
+  security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["backend_sg"]]
+
   # load_balancer = {
   #   service = {
   #     target_group_arn = ""
@@ -105,8 +106,7 @@ module "service_backend" {
   #   }
   # }
 
-  subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
-  security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["backend_sg"]]
+
   # security_group_ingress_rules = {
   #   alb_access = {
   #     description                  = "Service port"
