@@ -84,12 +84,12 @@ module "service_frontend" {
       target_group_arn = "${aws_lb_target_group.frontend_blue.arn}"
       container_name   = "${local.frontend_container.name}"
       container_port   = "${local.frontend_container.port}"
-      advanced_configuration = {
-        alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
-        production_listener_rule   = aws_lb_listener.listener.arn
-        role_arn                   = aws_lb_target_group.frontend_blue.arn
-        test_listener_rule         = aws_lb_listener.listener_test.arn
-      }
+      # advanced_configuration = {
+      #   alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
+      #   production_listener_rule   = aws_lb_listener.listener.arn
+      #   role_arn                   = aws_lb_target_group.frontend_blue.arn
+      #   test_listener_rule         = aws_lb_listener.listener_test.arn
+      # }
     }
   }
 
