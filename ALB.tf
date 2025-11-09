@@ -267,10 +267,11 @@ resource "aws_lb_listener_rule" "frontend" {
 # DATA RESOURCE: LISTENER RULES
 #
 ################################################################################
-data "aws_lb_listener_rule" "primary" {
-  listener_arn = aws_lb_listener.listener.arn
-}
+# data "aws_lb_listener_rule" "primary" {
+#   listener_arn = aws_lb_listener.listener.arn
 
-data "aws_lb_listener_rule" "test" {
-  listener_arn = aws_lb_listener.listener_test.arn
-}
+# }
+
+# data "aws_lb_listener_rule" "test" {
+#   listener_arn = aws_lb_listener.listener_test.arn
+# }
