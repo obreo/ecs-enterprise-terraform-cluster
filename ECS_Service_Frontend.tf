@@ -22,8 +22,8 @@ module "service_frontend" {
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"],upper(t)) ? "EC2" : "FARGATE"]))
-  capacity_provider_strategy = local.service_capacity_provider_map
+  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"], upper(t)) ? "EC2" : "FARGATE"]))
+  capacity_provider_strategy         = local.service_capacity_provider_map
 
   container_definitions = {
     "${local.frontend_container.name}" = {
@@ -49,8 +49,8 @@ module "service_frontend" {
       enable_cloudwatch_logging              = true
       cloudwatch_log_group_retention_in_days = 7
 
-      
-      memoryReservation        = 100
+
+      memoryReservation = 100
       restartPolicy = {
         enabled              = true
         ignoredExitCodes     = [1]
@@ -91,7 +91,7 @@ module "service_frontend" {
     lifecycle_hook = {
       "TEST_TRAFFIC_SHIFT" = {
         hook_target_arn  = data.terraform_remote_state.base.outputs.lambda_post_traffic_arn # lambda function
-        role_arn         = "${aws_iam_role.ecs_service_role.arn}"                    # invoke lambda role
+        role_arn         = "${aws_iam_role.ecs_service_role.arn}"                           # invoke lambda role
         lifecycle_stages = ["TEST_TRAFFIC_SHIFT"]                                           # lifecycle hook stage
         hook_details = jsonencode({                                                         # what should be passed to the lambda event json.
           TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
@@ -110,28 +110,28 @@ module "service_frontend" {
 
 # ADDITIONAL TASK DEFINITION CONFIGS
 
-  # logConfiguration = {
-  #   logConfiguration = {
-  #     logDriver = "awslogs"
-  #     options = {
-  #       awslogs-group         = "/aws/ecs"
-  #       awslogs-region        = "us-east-1"
-  #       awslogs-stream-prefix = "ecs"
-  #     }
-  #   }
-  # }
+# logConfiguration = {
+#   logConfiguration = {
+#     logDriver = "awslogs"
+#     options = {
+#       awslogs-group         = "/aws/ecs"
+#       awslogs-region        = "us-east-1"
+#       awslogs-stream-prefix = "ecs"
+#     }
+#   }
+# }
 
-  # security_group_ingress_rules = {
-  #   alb_access = {
-  #     description                  = "Service port"
-  #     from_port                    = local.frontend_container.port
-  #     ip_protocol                  = "tcp"
-  #     reference_security_group_id  = "${data.terraform_remote_state.vpc.outputs.security_group_ids["ecs-enterprise-alb"]}"
-  #   }
-  # }
-  # security_group_egress_rules = {
-  #   all = {
-  #     ip_protocol = "-1"
-  #     cidr_ipv4   = "0.0.0.0/0"
-  #   }
-  # }
+# security_group_ingress_rules = {
+#   alb_access = {
+#     description                  = "Service port"
+#     from_port                    = local.frontend_container.port
+#     ip_protocol                  = "tcp"
+#     reference_security_group_id  = "${data.terraform_remote_state.vpc.outputs.security_group_ids["ecs-enterprise-alb"]}"
+#   }
+# }
+# security_group_egress_rules = {
+#   all = {
+#     ip_protocol = "-1"
+#     cidr_ipv4   = "0.0.0.0/0"
+#   }
+# }

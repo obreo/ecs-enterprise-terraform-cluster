@@ -22,8 +22,8 @@ module "service_backend" {
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"],upper(t)) ? "EC2" : "FARGATE"]))
-  capacity_provider_strategy = local.service_capacity_provider_map
+  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"], upper(t)) ? "EC2" : "FARGATE"]))
+  capacity_provider_strategy         = local.service_capacity_provider_map
 
 
   container_definitions = {
@@ -60,7 +60,7 @@ module "service_backend" {
     }
   }
 
-  
+
   service_connect_configuration = {
     namespace = "${aws_service_discovery_http_namespace.namespace.name}"
     service = [{
@@ -83,37 +83,37 @@ module "service_backend" {
 
 # ADDITIONAL TASK DEFINITION CONFIGS
 
-  # logConfiguration = {
-  #   logConfiguration = {
-  #     logDriver = "awslogs"
-  #     options = {
-  #       awslogs-group         = "/aws/ecs"
-  #       awslogs-region        = "us-east-1"
-  #       awslogs-stream-prefix = "ecs"
-  #     }
-  #   }
-  # }
+# logConfiguration = {
+#   logConfiguration = {
+#     logDriver = "awslogs"
+#     options = {
+#       awslogs-group         = "/aws/ecs"
+#       awslogs-region        = "us-east-1"
+#       awslogs-stream-prefix = "ecs"
+#     }
+#   }
+# }
 
-  # load_balancer = {
-  #   service = {
-  #     target_group_arn = ""
-  #     container_name   = "${local.backend_container.name}"
-  #     container_port   = "${local.backend_container.port}"
-  #   }
-  # }
+# load_balancer = {
+#   service = {
+#     target_group_arn = ""
+#     container_name   = "${local.backend_container.name}"
+#     container_port   = "${local.backend_container.port}"
+#   }
+# }
 
 
-  # security_group_ingress_rules = {
-  #   alb_access = {
-  #     description                  = "Service port"
-  #     from_port                    = local.backend_container.port
-  #     ip_protocol                  = "tcp"
-  #     reference_security_group_id  = ""
-  #   }
-  # }
-  # security_group_egress_rules = {
-  #   all = {
-  #     ip_protocol = "-1"
-  #     cidr_ipv4   = "0.0.0.0/0"
-  #   }
-  # }
+# security_group_ingress_rules = {
+#   alb_access = {
+#     description                  = "Service port"
+#     from_port                    = local.backend_container.port
+#     ip_protocol                  = "tcp"
+#     reference_security_group_id  = ""
+#   }
+# }
+# security_group_egress_rules = {
+#   all = {
+#     ip_protocol = "-1"
+#     cidr_ipv4   = "0.0.0.0/0"
+#   }
+# }

@@ -1,7 +1,7 @@
 # locals
 locals {
   # Pick launch type from variables
-  launch_types = [for t in try(var.cluster_config.launch_types, ["FARGATE_SPOT"]) : upper(t)]
+  launch_types   = [for t in try(var.cluster_config.launch_types, ["FARGATE_SPOT"]) : upper(t)]
   instance_types = try(var.cluster_config.instance_type, ["t3.medium"]) # list
 
   # Determine which providers are in use
@@ -9,7 +9,7 @@ locals {
   use_fargate = length([for t in local.launch_types : t if t == "FARGATE" || t == "FARGATE_SPOT"]) > 0
   use_spot    = length([for t in local.launch_types : t if t == "EC2_SPOT" || t == "FARGATE_SPOT"]) > 0
 
-# Dynamically build autoscaling capacity providers (EC2 only)
+  # Dynamically build autoscaling capacity providers (EC2 only)
   autoscaling_capacity_providers = merge(
     contains(local.launch_types, "EC2") ? {
       EC2 = {
@@ -41,7 +41,7 @@ locals {
       }
     } : {}
   )
-  
+
   # Dynamic default capacity provider strategy
   default_capacity_provider_strategy = merge(
     contains(local.launch_types, "FARGATE") ? {

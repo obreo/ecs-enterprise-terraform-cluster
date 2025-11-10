@@ -43,8 +43,8 @@ locals {
   }
   # Build final autoscaling map dynamically
   autoscaling_map = merge(
-    local.use_ec2  ? { EC2      = local.ec2_ondemand } : {},
-    local.use_spot ? { EC2_SPOT = local.ec2_spot }     : {}
+    local.use_ec2 ? { EC2 = local.ec2_ondemand } : {},
+    local.use_spot ? { EC2_SPOT = local.ec2_spot } : {}
   )
 }
 
