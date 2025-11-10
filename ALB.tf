@@ -275,7 +275,7 @@ resource "aws_lb_listener_rule" "frontend_test" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend_blue.arn
+    target_group_arn = aws_lb_target_group.frontend_green.arn
   }
 
   condition {
