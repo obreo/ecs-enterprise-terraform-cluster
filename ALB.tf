@@ -253,6 +253,12 @@ resource "aws_lb_listener_rule" "frontend" {
     }
   }
 
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
+
   lifecycle {
     ignore_changes = all
   }
@@ -262,16 +268,28 @@ resource "aws_lb_listener_rule" "frontend" {
   ]
 }
 
-################################################################################
-#
-# DATA RESOURCE: LISTENER RULES
-#
-################################################################################
-# data "aws_lb_listener_rule" "primary" {
-#   listener_arn = aws_lb_listener.listener.arn
+# Listener rule: Frontend - Hostname
+resource "aws_lb_listener_rule" "frontend_test" {
+  listener_arn = aws_lb_listener.listener_test.arn
+  priority     = 3
 
-# }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend_blue.arn
+  }
 
-# data "aws_lb_listener_rule" "test" {
-#   listener_arn = aws_lb_listener.listener_test.arn
-# }
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
+
+  lifecycle {
+    ignore_changes = all
+  }
+
+  depends_on = [
+    aws_lb.load_balancer
+  ]
+}
+

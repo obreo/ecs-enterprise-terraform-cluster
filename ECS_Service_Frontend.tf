@@ -84,9 +84,9 @@ module "service_frontend" {
       container_port   = "${local.frontend_container.port}"
       advanced_configuration = {
         alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
-        production_listener_rule   = aws_lb_listener.listener.arn
-        role_arn                   = aws_iam_role.ecs_service_role.arn
-        test_listener_rule         = aws_lb_listener.listener_test.arn
+        production_listener_rule   = aws_lb_listener_rule.frontend.arn
+        role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
+        test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
       }
     }
   }
@@ -97,7 +97,7 @@ module "service_frontend" {
     lifecycle_hook = {
       "TEST_TRAFFIC_SHIFT" = {
         hook_target_arn  = data.terraform_remote_state.base.outputs.lambda_post_traffic_arn # lambda function
-        role_arn         = "${aws_iam_role.ecs_task_execution_role.arn}"                    # invoke lambda role
+        role_arn         = "${aws_iam_role.ecs_service_role.arn}"                    # invoke lambda role
         lifecycle_stages = ["TEST_TRAFFIC_SHIFT"]                                           # lifecycle hook stage
         hook_details = jsonencode({                                                         # what should be passed to the lambda event json.
           TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
