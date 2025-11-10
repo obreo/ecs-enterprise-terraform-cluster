@@ -35,10 +35,10 @@ variable "secrets_s3_bucket" {
 
 
 variable "cluster_config" {
-  type = optional(object({
+  type = object({
     launch_types = optional(list(string), ["FARGATE_SPOT"])
     instance_type = optional(list(string), [""])
-  }))
+  })
 
   validation {
     condition = alltrue([
