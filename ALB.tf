@@ -131,7 +131,7 @@ resource "aws_lb_target_group" "frontend_green" {
   deregistration_delay = 30 # seconds
   health_check {
     enabled             = true
-    port                = 80
+    port                = 8080
     protocol            = "HTTP"
     interval            = 10
     timeout             = 5
@@ -178,9 +178,9 @@ resource "aws_lb_listener" "listener" {
     target_group_arn = aws_lb_target_group.frontend_blue.arn
   }
 
-  lifecycle {
-    ignore_changes = all
-  }
+  # lifecycle {
+  #   ignore_changes = all
+  # }
 
   depends_on = [
     aws_lb.load_balancer
@@ -197,9 +197,9 @@ resource "aws_lb_listener" "listener_test" {
     target_group_arn = aws_lb_target_group.frontend_green.arn
   }
 
-  lifecycle {
-    ignore_changes = all
-  }
+  # lifecycle {
+  #   ignore_changes = all
+  # }
 
   depends_on = [
     aws_lb.load_balancer
@@ -211,31 +211,6 @@ resource "aws_lb_listener" "listener_test" {
 # RULES
 #
 ################################################################################
-
-# Listener rule: Backend - Hostname
-# resource "aws_lb_listener_rule" "backend" {
-#   listener_arn = aws_lb_listener.listener[count.index].arn
-#   priority     = 1
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.backend_blue.arn
-#   }
-
-#   condition {
-#     host_header {
-#       values = ["${var.backend_domain}"]
-#     }
-#   }
-
-#   lifecycle {
-#     ignore_changes = all
-#   }
-
-#   depends_on = [
-#     aws_lb.load_balancer
-#   ]
-# }
 
 # Listener rule: Frontend - Hostname
 resource "aws_lb_listener_rule" "frontend" {
