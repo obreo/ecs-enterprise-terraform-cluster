@@ -259,9 +259,9 @@ resource "aws_lb_listener_rule" "frontend" {
     }
   }
 
-  lifecycle {
-    ignore_changes = all
-  }
+  # lifecycle {
+  #   ignore_changes = all
+  # }
 
   depends_on = [
     aws_lb.load_balancer
@@ -284,9 +284,9 @@ resource "aws_lb_listener_rule" "frontend_test" {
     }
   }
 
-  lifecycle {
-    ignore_changes = all
-  }
+  # lifecycle {
+  #   ignore_changes = all
+  # }
 
   depends_on = [
     aws_lb.load_balancer
