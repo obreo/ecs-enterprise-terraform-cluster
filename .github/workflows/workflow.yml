@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - production
-      #- staging
+      - staging
       - development
   workflow_dispatch:
 
@@ -72,8 +72,8 @@ jobs:
     needs: base
 
     env:
-      BACKEND: 'environments/production/backend.tfvars'
-      VARIABLES: 'environments/production/variables.tfvars'
+      BACKEND: 'environments/development/backend.tfvars'
+      VARIABLES: 'environments/development/variables.tfvars'
       REGION: ${{vars.REGION}}
 
     steps:
@@ -96,11 +96,14 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{env.VARIABLES}}
+        run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
 
-      - name: Report Success
-        if: success()
-        run: echo "✅ Terraform validation succeeded!"
+      # - name: Terraform Apply
+      #   run: terraform apply -auto-approve "tfplan"
+
+      # - name: Report Success
+      #   if: success()
+      #   run: echo "✅ Terraform apply succeeded for the ${{github.ref_name}} environment!"
 
 
   staging:
@@ -131,12 +134,12 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve "tfplan"
+      # - name: Terraform Apply
+      #   run: terraform apply -auto-approve "tfplan"
 
-      - name: Report Success
-        if: success()
-        run: echo "✅ Terraform apply succeeded for the ${{github.ref_name}} environment!"
+      # - name: Report Success
+      #   if: success()
+      #   run: echo "✅ Terraform apply succeeded for the ${{github.ref_name}} environment!"
               
 
   production:

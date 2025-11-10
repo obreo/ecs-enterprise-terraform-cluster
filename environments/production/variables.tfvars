@@ -22,3 +22,8 @@ secrets_s3_bucket = {
     enable_secrets_bucket = false
     bucket_name = ""
 }
+
+cluster_config = {
+    launch_types = ["EC2"]
+    instance_type = ["t3.medium"]
+}

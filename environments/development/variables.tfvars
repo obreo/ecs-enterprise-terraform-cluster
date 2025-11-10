@@ -1,7 +1,7 @@
 cluster_name = "ecs-enterprise"
-environment = "staging"
+environment = "development"
 
-domain = "staging.abralabs.com"
+domain = "dev.abralabs.com"
 
 terraform_remote_outputs_vpc = {
     s3_bucket     = "abra-terraform-states"
@@ -22,7 +22,6 @@ secrets_s3_bucket = {
     enable_secrets_bucket = false
     bucket = ""
 }
-
 cluster_config = {
     launch_types = ["FARGATE_SPOT"]
     instance_type = [""]

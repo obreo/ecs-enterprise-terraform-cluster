@@ -1,3 +1,81 @@
+# locals
+locals {
+  # Pick launch type from variables
+  launch_types = [for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : upper(t)]
+
+  # Determine which providers are in use
+  use_ec2     = length([for t in local.launch_types : t if t == "EC2" || t == "EC2_SPOT"]) > 0
+  use_fargate = length([for t in local.launch_types : t if t == "FARGATE" || t == "FARGATE_SPOT"]) > 0
+  use_spot    = length([for t in local.launch_types : t if t == "EC2_SPOT" || t == "FARGATE_SPOT"]) > 0
+
+# Dynamically build autoscaling capacity providers (EC2 only)
+  autoscaling_capacity_providers = merge(
+    contains(local.launch_types, "EC2") ? {
+      EC2 = {
+        auto_scaling_group_arn         = module.autoscaling["EC2"].autoscaling_group_arn
+        managed_draining               = "ENABLED"
+        managed_termination_protection = "ENABLED"
+
+        managed_scaling = {
+          maximum_scaling_step_size = 5
+          minimum_scaling_step_size = 1
+          status                    = "ENABLED"
+          target_capacity           = 100
+        }
+      }
+    } : {},
+
+    contains(local.launch_types, "EC2_SPOT") ? {
+      EC2_SPOT = {
+        auto_scaling_group_arn         = try(module.autoscaling["EC2_SPOT"].autoscaling_group_arn, null)
+        managed_draining               = "ENABLED"
+        managed_termination_protection = "ENABLED"
+
+        managed_scaling = {
+          maximum_scaling_step_size = 4
+          minimum_scaling_step_size = 1
+          status                    = "ENABLED"
+          target_capacity           = 100
+        }
+      }
+    } : {}
+  )
+  
+  # Dynamic default capacity provider strategy
+  default_capacity_provider_strategy = merge(
+    contains(local.launch_types, "FARGATE") ? {
+      FARGATE = {
+        weight = 50
+        base   = 1
+      }
+    } : {},
+    contains(local.launch_types, "FARGATE_SPOT") ? {
+      FARGATE_SPOT = {
+        weight = 30
+      }
+    } : {},
+    contains(local.launch_types, "EC2") ? {
+      EC2 = {
+        weight = 70
+        base   = 1
+      }
+    } : {},
+    contains(local.launch_types, "EC2_SPOT") ? {
+      EC2_SPOT = {
+        weight = 30
+      }
+    } : {}
+  )
+
+  service_capacity_provider_map = {
+    for k, v in local.default_capacity_provider_strategy : k => {
+      capacity_provider = contains(["EC2", "EC2_SPOT"], k) ? module.ecs_cluster.autoscaling_capacity_providers[k].name : k
+      weight            = v.weight
+      base              = try(v.base, 0)
+    }
+  }
+}
+
 module "ecs_cluster" {
   source  = "terraform-aws-modules/ecs/aws//modules/cluster"
   version = "6.7.0"
@@ -14,50 +92,10 @@ module "ecs_cluster" {
     }
   }
 
-  autoscaling_capacity_providers = { # For EC2 cluster capacity providers
-    # On-demand instances
-    EC2 = {
-      auto_scaling_group_arn         = module.autoscaling["EC2"].autoscaling_group_arn
-      managed_draining               = "ENABLED"
-      managed_termination_protection = "ENABLED" # Should be synced with asg termination protection.
-
-      managed_scaling = {
-        maximum_scaling_step_size = 5
-        minimum_scaling_step_size = 1
-        status                    = "ENABLED"
-        target_capacity           = 100
-      }
-    }
-
-    # Spot instances
-    # EC2_SPOT = {
-    #     auto_scaling_group_arn         = module.autoscaling["EC2_SPOT"].autoscaling_group_arn
-    #     managed_draining               = "ENABLED"
-    #     managed_termination_protection = "ENABLED"
-
-    #     managed_scaling = {
-    #         maximum_scaling_step_size = 5
-    #         minimum_scaling_step_size = 1
-    #         status                    = "ENABLED"
-    #         target_capacity           = 90
-    #     }
-    # }
-  }
+  autoscaling_capacity_providers = local.autoscaling_capacity_providers
 
   # Cluster capacity providers
-  default_capacity_provider_strategy = {
-    # FARGATE = {
-    #   weight = 50
-    #   base   = 1
-    # }
-    # FARGATE_SPOT = {
-    # weight = 30
-    # }
-    EC2 = { # On-demand instances - can be any name defined in autoscaling_capacity_providers
-      weight = 70
-      base   = 1
-    }
-  }
+  default_capacity_provider_strategy = local.default_capacity_provider_strategy
 
   tags = {
     Environment = "${var.environment}"

@@ -1,3 +1,60 @@
+# locals
+
+locals {
+  # Normalize launch types to uppercase list
+  launch_types   = [for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : upper(t)]
+  instance_types = try(var.cluster_config.instance_type, ["t3.medium"]) # list
+
+  # Determine which capacity providers are used
+  use_ec2  = contains(local.launch_types, "EC2")
+  use_spot = contains(local.launch_types, "EC2_SPOT")
+
+  # Base user_data shared by both
+  base_user_data = <<-EOT
+    #!/bin/bash
+    cat <<'EOF' >> /etc/ecs/ecs.config
+    ECS_CLUSTER=${var.cluster_name}
+    ECS_LOGLEVEL=debug
+    ECS_ENABLE_TASK_IAM_ROLE=true
+  EOT
+
+  # On-demand EC2
+  ec2_ondemand = {
+    instance_type              = local.instance_types[0]
+    use_mixed_instances_policy = false
+    mixed_instances_policy     = null
+    user_data                  = "${local.base_user_data}\nEOF"
+  }
+
+
+  # Spot EC2
+  ec2_spot = {
+    instance_type              = local.instance_types[0]
+    use_mixed_instances_policy = true
+    mixed_instances_policy = {
+      instances_distribution = {
+        on_demand_base_capacity                  = 0
+        on_demand_percentage_above_base_capacity = 0
+        spot_allocation_strategy                 = "price-capacity-optimized"
+      }
+      launch_template = {
+        override = [
+          for itype in local.instance_types : {
+            instance_type     = itype
+            weighted_capacity = "1"
+          }
+        ]
+      }
+    }
+    user_data = "${local.base_user_data}\nECS_ENABLE_SPOT_INSTANCE_DRAINING=true\nEOF"
+  }
+  # Build final autoscaling map dynamically
+  autoscaling_map = merge(
+    local.use_ec2  ? { EC2      = local.ec2_ondemand } : {},
+    local.use_spot ? { EC2_SPOT = local.ec2_spot }     : {}
+  )
+}
+
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html#ecs-optimized-ami-linux
 data "aws_ssm_parameter" "ecs_optimized_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2023/recommended"
@@ -7,60 +64,7 @@ module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 9.0"
 
-  for_each = {
-    # On-demand instances
-    EC2 = {
-      instance_type              = "t3.medium"
-      use_mixed_instances_policy = false
-      mixed_instances_policy     = null
-      user_data                  = <<-EOT
-        #!/bin/bash
-
-        cat <<'EOF' >> /etc/ecs/ecs.config
-        ECS_CLUSTER=${var.cluster_name}
-        ECS_LOGLEVEL=debug
-        ECS_ENABLE_TASK_IAM_ROLE=true
-        EOF
-      EOT
-    }
-
-    # Spot instances
-    # EC2_Spot = {
-    #   instance_type              = "t3.medium"
-    #   use_mixed_instances_policy = true
-    #   mixed_instances_policy = {
-    #     instances_distribution = {
-    #       on_demand_base_capacity                  = 0
-    #       on_demand_percentage_above_base_capacity = 0
-    #       spot_allocation_strategy                 = "price-capacity-optimized"
-    #     }
-
-    #     launch_template = {
-    #       override = [
-    #         {
-    #           instance_type     = "t3.medium"
-    #           weighted_capacity = "2"
-    #         },
-    #         {
-    #           instance_type     = "t3.small"
-    #           weighted_capacity = "1"
-    #         },
-    #       ]
-    #     }
-    #   }
-    #   user_data = <<-EOT
-    #     #!/bin/bash
-
-    #     cat <<'EOF' >> /etc/ecs/ecs.config
-    #     ECS_CLUSTER=${local.name}
-    #     ECS_LOGLEVEL=debug
-    #     ECS_CONTAINER_INSTANCE_TAGS=
-    #     ECS_ENABLE_TASK_IAM_ROLE=true
-    #     ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
-    #     EOF
-    #   EOT
-    # }
-  }
+  for_each = local.autoscaling_map
 
   name = "${var.cluster_name}-autoscaling-${each.key}"
 
@@ -102,6 +106,7 @@ module "autoscaling" {
   }
 }
 
+# Allowing ALB to connect to EC2 cluster
 module "autoscaling_sg" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.3.1"

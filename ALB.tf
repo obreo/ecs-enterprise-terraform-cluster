@@ -189,8 +189,7 @@ resource "aws_lb_listener" "listener" {
 
 resource "aws_lb_listener" "listener_test" {
   load_balancer_arn = aws_lb.load_balancer.arn
-  port              = "8080" # HTTP 80 used, for HTTPS 443 port there must be a TLS certificate defined.
-  protocol          = "HTTP"
+  port              = "8080" 
 
   default_action {
     type             = "forward"

@@ -22,14 +22,8 @@ module "service_frontend" {
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  requires_compatibilities = ["EC2"]
-  capacity_provider_strategy = {
-    EC2 = {
-      capacity_provider = module.ecs_cluster.autoscaling_capacity_providers["EC2"].name
-      base              = 1
-      weight            = 1
-    }
-  }
+  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"],upper(t)) ? "EC2" : "FARGATE"]))
+  capacity_provider_strategy = local.service_capacity_provider_map
 
   container_definitions = {
     "${local.frontend_container.name}" = {

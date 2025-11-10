@@ -34,6 +34,21 @@ variable "secrets_s3_bucket" {
 }
 
 
+variable "cluster_config" {
+  type = optional(object({
+    launch_types = optional(list(string), ["FARGATE_SPOT"])
+    instance_type = optional(list(string), [""])
+  }))
+
+  validation {
+    condition = alltrue([
+      for t in try(var.cluster_config.launch_types, ["FARGATE_SPOT"]) :
+      contains(["EC2", "EC2_SPOT", "FARGATE", "FARGATE_SPOT"], upper(t))
+      ])
+    error_message = "launch_type must be one of: EC2, EC2_SPOT, FARGATE, FARGATE_SPOT."
+  }
+}
+
 # Collect Info outputs from VPC module:
 
 variable "terraform_remote_outputs_vpc" {
@@ -68,3 +83,4 @@ data "terraform_remote_state" "base" {
     region = "us-east-1"
   }
 }
+
