@@ -1,13 +1,6 @@
 # locals
 
 locals {
-  # Normalize launch types to uppercase list
-  launch_types   = [for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : upper(t)]
-  instance_types = try(var.cluster_config.instance_type, ["t3.medium"]) # list
-
-  # Determine which capacity providers are used
-  use_ec2  = contains(local.launch_types, "EC2")
-  use_spot = contains(local.launch_types, "EC2_SPOT")
 
   # Base user_data shared by both
   base_user_data = <<-EOT
