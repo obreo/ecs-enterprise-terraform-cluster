@@ -1,7 +1,7 @@
 # locals
 locals {
   # Pick launch type from variables
-  launch_types = [for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : upper(t)]
+  launch_types = [for t in try(var.cluster_config.launch_types, ["FARGATE_SPOT"]) : upper(t)]
   instance_types = try(var.cluster_config.instance_type, ["t3.medium"]) # list
 
   # Determine which providers are in use
@@ -100,7 +100,7 @@ module "ecs_cluster" {
 
   tags = {
     Environment = "${var.environment}"
-    Project     = "EcsEc2"
+    Project     = "${var.cluster_name}"
   }
 
   create_task_exec_iam_role = true
