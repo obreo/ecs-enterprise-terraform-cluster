@@ -26,8 +26,10 @@ module "service_frontend" {
   capacity_provider_strategy         = local.service_capacity_provider_map
 
   ordered_placement_strategy = {
-    type  = "binpack"
-    field = "cpu"
+    binpak = {
+      type  = "binpack"
+      field = "cpu"
+    }
   }
 
   container_definitions = {
