@@ -82,7 +82,7 @@ module "service_frontend" {
     #     alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
     #     test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
     #   }
-    # }
+    }
   }
 
   deployment_configuration = {
@@ -98,7 +98,7 @@ module "service_frontend" {
     #     })
     #   }
     }
-  }
+    
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["frontend_sg"], module.autoscaling_sg.security_group_id]
 
