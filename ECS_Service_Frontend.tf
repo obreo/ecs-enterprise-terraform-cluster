@@ -92,7 +92,7 @@ module "service_frontend" {
       "TEST_TRAFFIC_SHIFT" = {
         hook_target_arn  = data.terraform_remote_state.base.outputs.lambda_post_traffic_arn # lambda function
         role_arn         = "${aws_iam_role.ecs_service_role.arn}"                           # invoke lambda role
-        lifecycle_stages = ["POST_TEST_TRAFFIC_SHIFT"]                                           # lifecycle hook stage
+        lifecycle_stages = ["POST_TEST_TRAFFIC_SHIFT"]                                      # lifecycle hook stage
         hook_details = jsonencode({                                                         # what should be passed to the lambda event json.
           TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
         })
