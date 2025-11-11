@@ -25,6 +25,11 @@ module "service_frontend" {
   requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"], upper(t)) ? "EC2" : "FARGATE"]))
   capacity_provider_strategy         = local.service_capacity_provider_map
 
+  ordered_placement_strategy = {
+    type  = "binpack"
+    field = "cpu"
+  }
+
   container_definitions = {
     "${local.frontend_container.name}" = {
       cpu       = 256
@@ -98,7 +103,7 @@ module "service_frontend" {
     #     })
     #   }
     }
-    
+
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["frontend_sg"], module.autoscaling_sg.security_group_id]
 
