@@ -77,9 +77,9 @@ module "service_frontend" {
       container_name   = "${local.frontend_container.name}"
       container_port   = "${local.frontend_container.port}"
       advanced_configuration = {
-        alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
-        production_listener_rule   = aws_lb_listener_rule.frontend.arn
         role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
+        production_listener_rule   = aws_lb_listener_rule.frontend.arn
+        alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
         test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
       }
     }

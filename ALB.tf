@@ -23,72 +23,8 @@ resource "aws_lb" "load_balancer" {
 #
 ################################################################################
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group-
-# # Backend
-# resource "aws_lb_target_group" "blue" {
-#   count    = var.disable_autoscaling[0] == "true" ? 0 : 1
-#   name     = "${var.name[0]}-blue"
-#   port     = 80
-#   protocol = "HTTP"
-#   #target_type          = var.fargate_cluster == true ? "ip" : "instance"
-#   target_type          = "ip"
-#   vpc_id               = var.include_vpc[0] == "true" ? aws_vpc.vpc[count.index].id : var.include_vpc[1]
-#   deregistration_delay = 30 # seconds
-#   health_check {
-#     enabled             = true
-#     port                = 80
-#     protocol            = "HTTP"
-#     interval            = 10
-#     timeout             = 5
-#     healthy_threshold   = 2
-#     unhealthy_threshold = 2
-#     matcher             = "200,202,302"
-#     path                = "/"
-#   }
-#   stickiness {
-#     enabled         = true
-#     cookie_duration = 86400 # Seconds = 1 Day
-#     type            = "lb_cookie"
-#   }
-
-#   depends_on = [
-#     aws_lb.load_balancer
-#   ]
-# }
-
-# resource "aws_lb_target_group" "green" {
-#   count                = var.disable_autoscaling[0] == "true" ? 0 : 1
-#   name                 = "${var.name[0]}-green"
-#   port                 = 80
-#   protocol             = "HTTP"
-#   target_type          = "ip"
-#   vpc_id               = var.include_vpc[0] == "true" ? aws_vpc.vpc[count.index].id : var.include_vpc[1]
-#   deregistration_delay = 30 # seconds
-#   health_check {
-#     enabled             = true
-#     port                = 80
-#     protocol            = "HTTP"
-#     interval            = 10
-#     timeout             = 5
-#     healthy_threshold   = 2
-#     unhealthy_threshold = 2
-#     matcher             = "200,202,302"
-#     path                = "/"
-#   }
-#   stickiness {
-#     enabled         = true
-#     cookie_duration = 86400 # Seconds = 1 Day
-#     type            = "lb_cookie"
-#   }
-
-#   depends_on = [
-#     aws_lb.load_balancer
-#   ]
-# }
-
-
 # Frontend
 resource "aws_lb_target_group" "frontend_blue" {
-  #   count                = var.disable_autoscaling[0] == "false" && var.include_frontend_ecs_service == true ? 1 : 0
   name                 = "${var.cluster_name}-${var.environment}"
   port                 = 80
   protocol             = "HTTP"
@@ -124,14 +60,14 @@ resource "aws_lb_target_group" "frontend_blue" {
 
 resource "aws_lb_target_group" "frontend_green" {
   name                 = "${var.cluster_name}-${var.environment}-alt"
-  port                 = 8080
+  port                 = 80
   protocol             = "HTTP"
   target_type          = "ip"
   vpc_id               = data.terraform_remote_state.vpc.outputs.vpc_id
   deregistration_delay = 30 # seconds
   health_check {
     enabled             = true
-    port                = 8080
+    port                = 80
     protocol            = "HTTP"
     interval            = 10
     timeout             = 5
@@ -156,11 +92,10 @@ resource "aws_lb_target_group" "frontend_green" {
   ]
 }
 
-# Listener & Listener rule
 
 ################################################################################
 #
-# Listener
+# Listener & Listener rule
 #
 ################################################################################
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener
@@ -211,8 +146,6 @@ resource "aws_lb_listener" "listener_test" {
 # RULES
 #
 ################################################################################
-
-# Listener rule: Frontend - Hostname
 resource "aws_lb_listener_rule" "frontend" {
   listener_arn = aws_lb_listener.listener.arn
   priority     = 2
@@ -243,7 +176,6 @@ resource "aws_lb_listener_rule" "frontend" {
   ]
 }
 
-# Listener rule: Frontend - Hostname
 resource "aws_lb_listener_rule" "frontend_test" {
   listener_arn = aws_lb_listener.listener_test.arn
   priority     = 3
