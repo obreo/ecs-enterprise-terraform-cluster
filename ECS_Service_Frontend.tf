@@ -76,27 +76,27 @@ module "service_frontend" {
       target_group_arn = "${aws_lb_target_group.frontend_blue.arn}"
       container_name   = "${local.frontend_container.name}"
       container_port   = "${local.frontend_container.port}"
-      advanced_configuration = {
-        role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
-        production_listener_rule   = aws_lb_listener_rule.frontend.arn
-        alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
-        test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
-      }
-    }
+    #   advanced_configuration = { # For Blue Green
+    #     role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
+    #     production_listener_rule   = aws_lb_listener_rule.frontend.arn
+    #     alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
+    #     test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
+    #   }
+    # }
   }
 
   deployment_configuration = {
-    strategy             = "BLUE_GREEN"
-    bake_time_in_minutes = 1
-    lifecycle_hook = {
-      "TEST_TRAFFIC_SHIFT" = {
-        hook_target_arn  = data.terraform_remote_state.base.outputs.lambda_post_traffic_arn # lambda function
-        role_arn         = "${aws_iam_role.ecs_service_role.arn}"                           # invoke lambda role
-        lifecycle_stages = ["POST_TEST_TRAFFIC_SHIFT"]                                      # lifecycle hook stage
-        #hook_details = jsonencode({                                                         # what should be passed to the lambda event json.
-        #  TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
-        #})
-      }
+    strategy             = "ROLLING"
+    bake_time_in_minutes = 0
+    # lifecycle_hook = {        # For Blue Green
+    #   "TEST_TRAFFIC_SHIFT" = {
+    #     hook_target_arn  = data.terraform_remote_state.base.outputs.lambda_post_traffic_arn # lambda function
+    #     role_arn         = "${aws_iam_role.ecs_service_role.arn}"                           # invoke lambda role
+    #     lifecycle_stages = ["POST_TEST_TRAFFIC_SHIFT"]                                      # lifecycle hook stage
+    #     hook_details = jsonencode({                                                         # what should be passed to the lambda event json.
+    #       TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
+    #     })
+    #   }
     }
   }
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks

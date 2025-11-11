@@ -34,11 +34,11 @@ def lambda_handler(event, context):
         response = http.request("GET", test_endpoint, timeout=10.0)
         logger.info(f"Response status: {response.status}")
         
-        if response.status == 200:
+        if 200 <= response.status < 300:
             logger.info("Health check passed")
             return {
                 "hookStatus": "SUCCEEDED",
-                "reason": "Health check passed with status 200"
+                "reason": f"Health check passed with status {response.status}"
             }
         else:
             logger.error(f"Health check failed with status {response.status}")
