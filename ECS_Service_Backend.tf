@@ -1,5 +1,5 @@
 locals {
-  backend_container = { "name" = "solarstan-backend", "port" = 5000 }
+  backend_container = { "name" = "solarstan-backend", "port" = 80 }
 }
 
 module "service_backend" {
@@ -39,9 +39,10 @@ module "service_backend" {
       image     = "public.ecr.aws/nginx/nginx:latest"
       portMappings = [
         {
-          name          = "http"
+          name          = local.backend_container.name
           containerPort = local.backend_container.port
           protocol      = "tcp"
+          appProtocol   = "http"
         }
       ]
       healthCheck = {
