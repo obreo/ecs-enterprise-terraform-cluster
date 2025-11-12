@@ -2,10 +2,6 @@ locals {
   backend_container = { "name" = "solarstan-backend", "port" = 80 }
 }
 
-data "aws_ecs_task_definition" "service_backend" { 
-  task_definition = module.service_backend.task_definition_family 
-  }
-
 module "service_backend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
@@ -45,10 +41,7 @@ module "service_backend" {
       cpu       = 256
       memory    = 256
       essential = true
-      image = try(
-          jsondecode(data.aws_ecs_task_definition.service_backend.container_definitions)[0].image,
-          "public.ecr.aws/nginx/nginx:latest"
-        )
+      image = "public.ecr.aws/nginx/nginx:latest"
       portMappings = [
         {
           name          = "http"
