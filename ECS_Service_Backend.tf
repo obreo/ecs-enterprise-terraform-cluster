@@ -13,7 +13,7 @@ module "service_backend" {
   tasks_iam_role_arn             = aws_iam_role.ecs_task_role.arn
   enable_execute_command         = true
   availability_zone_rebalancing  = "DISABLED"
-  ignore_task_definition_changes = true
+  ignore_task_definition_changes = false
   create_task_exec_iam_role      = false
   create_iam_role                = false
   create_tasks_iam_role          = false
