@@ -19,9 +19,10 @@ loadbalancer = {
 }
 
 secrets_s3_bucket = {
-    enable_secrets_bucket = false
-    bucket = ""
+    enable_secrets_bucket = true
+    bucket_name = "ecs-enterprise"
 }
+
 cluster_config = {
     launch_types = ["FARGATE_SPOT"]
     instance_type = [""]

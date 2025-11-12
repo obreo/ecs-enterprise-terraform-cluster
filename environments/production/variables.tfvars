@@ -19,8 +19,8 @@ loadbalancer = {
 }
 
 secrets_s3_bucket = {
-    enable_secrets_bucket = false
-    bucket_name = ""
+    enable_secrets_bucket = true
+    bucket_name = "ecs-enterprise"
 }
 
 cluster_config = {
