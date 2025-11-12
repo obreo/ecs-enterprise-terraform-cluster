@@ -22,7 +22,7 @@ module "service_frontend" {
 
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_type, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"], upper(t)) ? "EC2" : "FARGATE"]))
+  requires_compatibilities           = tolist(toset([for t in try(var.cluster_config.launch_types, ["FARGATE_SPOT"]) : contains(["EC2", "EC2_SPOT"], upper(t)) ? "EC2" : "FARGATE"]))
   capacity_provider_strategy         = local.service_capacity_provider_map
 
   ordered_placement_strategy = {
