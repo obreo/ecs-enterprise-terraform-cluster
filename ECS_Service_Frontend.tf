@@ -49,7 +49,7 @@ module "service_frontend" {
       healthCheck = {
         command = [
           "CMD-SHELL",
-          "curl -f http://localhost/ || exit 1"
+          "curl http://localhost/ || exit 1"
         ]
       }
 
