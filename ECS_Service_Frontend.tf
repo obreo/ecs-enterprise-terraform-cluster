@@ -43,6 +43,7 @@ module "service_frontend" {
           name          = "http"
           containerPort = local.frontend_container.port
           protocol      = "tcp"
+          appProtocol   = "http"
         }
       ]
       healthCheck = {

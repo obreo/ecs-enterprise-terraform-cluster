@@ -39,7 +39,7 @@ module "service_backend" {
       image     = "public.ecr.aws/nginx/nginx:latest"
       portMappings = [
         {
-          name          = local.backend_container.name
+          name          = "http"
           containerPort = local.backend_container.port
           protocol      = "tcp"
           appProtocol   = "http"
@@ -74,7 +74,7 @@ module "service_backend" {
         port     = local.backend_container.port
         dns_name = "${local.backend_container.name}"
       }
-      port_name      = "http"
+      port_name      = 
       discovery_name = "${local.backend_container.name}"
     }]
   }
