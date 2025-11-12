@@ -13,6 +13,7 @@ module "service_backend" {
   tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
   enable_execute_command        = true
   availability_zone_rebalancing = "DISABLED"
+  ignore_task_definition_changes = false
 
   cpu                      = 256
   memory                   = 512
@@ -48,7 +49,7 @@ module "service_backend" {
       healthCheck = {
         command = [
           "CMD-SHELL",
-          "curl -f http://localhost/ || exit 1"
+          "curl http://localhost/ || exit 1"
         ]
       }
 
@@ -85,7 +86,9 @@ module "service_backend" {
   tags = {
     Environment = "${var.environment}"
   }
+
 }
+
 
 # Outputs: <NAME>_<PARAMETER_NAME>
 output "BACKEND_TASK_DEFINITION_NAME" {

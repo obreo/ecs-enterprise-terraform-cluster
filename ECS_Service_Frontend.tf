@@ -13,6 +13,7 @@ module "service_frontend" {
   tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
   enable_execute_command        = true
   availability_zone_rebalancing = "DISABLED"
+  ignore_task_definition_changes = false
 
   cpu                      = 256
   memory                   = 512
@@ -49,7 +50,7 @@ module "service_frontend" {
       healthCheck = {
         command = [
           "CMD-SHELL",
-          "curl http://localhost/ || exit 1"
+          "curl -f http://localhost/ || exit 1"
         ]
       }
 
