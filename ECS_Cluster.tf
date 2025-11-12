@@ -82,7 +82,7 @@ module "ecs_cluster" {
   version = "6.7.0"
 
   # Cluster 
-  name = var.cluster_name
+  name = "${var.cluster_name}-${var.environment}"
   configuration = {
     # Enable Container Insights - logging and monitoring
     execute_command_configuration = {

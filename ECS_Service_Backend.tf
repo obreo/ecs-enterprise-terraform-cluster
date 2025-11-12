@@ -2,18 +2,22 @@ locals {
   backend_container = { "name" = "solarstan-backend", "port" = 80 }
 }
 
+data "aws_ecs_task_definition" "service_backend" { 
+  task_definition = module.service_backend.task_definition_family 
+  }
+
 module "service_backend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
 
-  name                           = "${local.backend_container.name}"
+  name                           = "${local.backend_container.name}-${var.environment}"
   cluster_arn                    = module.ecs_cluster.arn
   iam_role_arn                   = aws_iam_role.ecs_service_role.arn
   task_exec_iam_role_arn         = aws_iam_role.ecs_task_execution_role.arn
   tasks_iam_role_arn             = aws_iam_role.ecs_task_role.arn
   enable_execute_command         = true
   availability_zone_rebalancing  = "DISABLED"
-  ignore_task_definition_changes = false
+  ignore_task_definition_changes = true
   create_task_exec_iam_role      = false
   create_iam_role                = false
   create_tasks_iam_role          = false
@@ -41,7 +45,10 @@ module "service_backend" {
       cpu       = 256
       memory    = 256
       essential = true
-      image     = "public.ecr.aws/nginx/nginx:latest"
+      image = try(
+          jsondecode(data.aws_ecs_task_definition.service_backend.container_definitions)[0].image,
+          "public.ecr.aws/nginx/nginx:latest"
+        )
       portMappings = [
         {
           name          = "http"
@@ -82,6 +89,20 @@ module "service_backend" {
       port_name      = "http"
       discovery_name = "${local.backend_container.name}"
     }]
+  }
+
+    load_balancer = {
+    frontend_service = {
+      target_group_arn = "${aws_lb_target_group.backend_blue.arn}"
+      container_name   = "${local.backend_container.name}"
+      container_port   = "${local.backend_container.port}"
+      #   advanced_configuration = { # For Blue Green
+      #     role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
+      #     production_listener_rule   = aws_lb_listener_rule.frontend.arn
+      #     alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
+      #     test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
+      #   }
+    }
   }
 
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks

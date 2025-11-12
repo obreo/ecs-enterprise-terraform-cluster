@@ -2,18 +2,22 @@ locals {
   frontend_container = { "name" = "solarstan-frontend", "port" = 80 }
 }
 
+data "aws_ecs_task_definition" "service_frontend" { 
+  task_definition = module.service_frontend.task_definition_family 
+  }
+
 module "service_frontend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
 
-  name                           = local.frontend_container.name
+  name                           = "${local.frontend_container.name}-${var.environment}"
   cluster_arn                    = module.ecs_cluster.arn
   iam_role_arn                   = aws_iam_role.ecs_service_role.arn
   task_exec_iam_role_arn         = aws_iam_role.ecs_task_execution_role.arn
   tasks_iam_role_arn             = aws_iam_role.ecs_task_role.arn
   enable_execute_command         = true
   availability_zone_rebalancing  = "DISABLED"
-  ignore_task_definition_changes = false
+  ignore_task_definition_changes = true
   create_task_exec_iam_role      = false
   create_iam_role                = false
   create_tasks_iam_role          = false
@@ -42,7 +46,10 @@ module "service_frontend" {
       cpu       = 256
       memory    = 256
       essential = true
-      image     = "public.ecr.aws/nginx/nginx:latest"
+      image = try(
+        jsondecode(data.aws_ecs_task_definition.service_frontend.container_definitions)[0].image,
+        "public.ecr.aws/nginx/nginx:latest"
+      )
       portMappings = [
         {
           name          = "http"

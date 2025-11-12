@@ -58,39 +58,39 @@ resource "aws_lb_target_group" "frontend_blue" {
   ]
 }
 
-# resource "aws_lb_target_group" "frontend_green" {
-#   name                 = "${var.cluster_name}-${var.environment}-alt"
-#   port                 = 80
-#   protocol             = "HTTP"
-#   target_type          = "ip"
-#   vpc_id               = data.terraform_remote_state.vpc.outputs.vpc_id
-#   deregistration_delay = 30 # seconds
-#   health_check {
-#     enabled             = true
-#     port                = 80
-#     protocol            = "HTTP"
-#     interval            = 10
-#     timeout             = 5
-#     healthy_threshold   = 2
-#     unhealthy_threshold = 2
-#     matcher             = "200,202,302"
-#     path                = "/"
-#   }
-#   stickiness {
-#     enabled         = true
-#     cookie_duration = 86400 # Seconds = 1 Day
-#     type            = "lb_cookie"
-#   }
+resource "aws_lb_target_group" "backend_blue" {
+  name                 = "${var.cluster_name}-${var.environment}-bb"
+  port                 = 80
+  protocol             = "HTTP"
+  target_type          = "ip"
+  vpc_id               = data.terraform_remote_state.vpc.outputs.vpc_id
+  deregistration_delay = 30 # seconds
+  health_check {
+    enabled             = true
+    port                = 80
+    protocol            = "HTTP"
+    interval            = 10
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200,202,302"
+    path                = "/"
+  }
+  stickiness {
+    enabled         = true
+    cookie_duration = 86400 # Seconds = 1 Day
+    type            = "lb_cookie"
+  }
 
-#   tags = {
-#     "Environment" = "${var.environment}"
-#     "Tier"        = "Frontend"
-#   }
+  tags = {
+    "Environment" = "${var.environment}"
+    "Tier"        = "Frontend"
+  }
 
-#   depends_on = [
-#     aws_lb.load_balancer
-#   ]
-# }
+  depends_on = [
+    aws_lb.load_balancer
+  ]
+}
 
 
 ################################################################################
@@ -176,27 +176,27 @@ resource "aws_lb_listener_rule" "frontend" {
   ]
 }
 
-# resource "aws_lb_listener_rule" "frontend_test" {
-#   listener_arn = aws_lb_listener.listener_test.arn
-#   priority     = 3
+resource "aws_lb_listener_rule" "backend_blue" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 3
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.frontend_green.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend_blue.arn
+  }
 
-#   condition {
-#     path_pattern {
-#       values = ["/*"]
-#     }
-#   }
+  condition {
+    path_pattern {
+      values = ["/api/submit/*"]
+    }
+  }
 
-#   # lifecycle {
-#   #   ignore_changes = all
-#   # }
+  # lifecycle {
+  #   ignore_changes = all
+  # }
 
-#   depends_on = [
-#     aws_lb.load_balancer
-#   ]
-# }
+  depends_on = [
+    aws_lb.load_balancer
+  ]
+}
 
