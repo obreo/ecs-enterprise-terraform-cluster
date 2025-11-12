@@ -13,7 +13,7 @@ module "service_backend" {
   tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
   enable_execute_command        = true
   availability_zone_rebalancing = "DISABLED"
-  ignore_task_definition_changes = false
+  ignore_task_definition_changes = true
 
   cpu                      = 256
   memory                   = 512
