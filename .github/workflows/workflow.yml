@@ -75,6 +75,7 @@ jobs:
       BACKEND: 'environments/development/backend.tfvars'
       VARIABLES: 'environments/development/variables.tfvars'
       REGION: ${{vars.REGION}}
+      SECRETS_BUCKET: ${{secrets.SECRETS_BUCKET}}
 
     steps:
       - name: Checkout repository
@@ -96,7 +97,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
+        run: terraform plan -var-file=${{env.VARIABLES}} -var "secrets_s3_bucket={\"enable_secrets_bucket\":true,\"bucket_name\":\"${{ env.SECRETS_BUCKET }}\"}" -out=tfplan
 
       # - name: Terraform Apply
       #   run: terraform apply -auto-approve "tfplan"
@@ -115,6 +116,7 @@ jobs:
       BACKEND: 'environments/staging/backend.tfvars'
       VARIABLES: 'environments/staging/variables.tfvars'
       REGION: ${{vars.REGION}}
+      SECRETS_BUCKET: ${{secrets.SECRETS_BUCKET}}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -132,7 +134,7 @@ jobs:
         run: terraform init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
+        run: terraform plan -var-file=${{env.VARIABLES}} -var "secrets_s3_bucket={\"enable_secrets_bucket\":true,\"bucket_name\":\"${{ env.SECRETS_BUCKET }}\"}" -out=tfplan
 
       # - name: Terraform Apply
       #   run: terraform apply -auto-approve "tfplan"
@@ -152,6 +154,7 @@ jobs:
       BACKEND: 'environments/production/backend.tfvars'
       VARIABLES: 'environments/production/variables.tfvars'
       REGION: ${{ vars.REGION }}
+      SECRETS_BUCKET: ${{secrets.SECRETS_BUCKET}}
 
     steps:
       - name: Checkout repository
@@ -170,7 +173,7 @@ jobs:
         run: terraform init -backend-config=${{env.BACKEND}} -var-file="${{env.VARIABLES}}" -reconfigure
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{env.VARIABLES}} -out=tfplan
+        run: terraform plan -var-file=${{env.VARIABLES}} -var "secrets_s3_bucket={\"enable_secrets_bucket\":true,\"bucket_name\":\"${{ env.SECRETS_BUCKET }}\"}" -out=tfplan
 
       - name: Terraform Apply
         run: terraform apply -auto-approve "tfplan"
