@@ -6,14 +6,18 @@ module "service_frontend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
 
-  name                          = local.frontend_container.name
-  cluster_arn                   = module.ecs_cluster.arn
-  iam_role_arn                  = aws_iam_role.ecs_service_role.arn
-  task_exec_iam_role_arn        = aws_iam_role.ecs_task_execution_role.arn
-  tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
-  enable_execute_command        = true
-  availability_zone_rebalancing = "DISABLED"
-  ignore_task_definition_changes = true
+  name                           = local.frontend_container.name
+  cluster_arn                    = module.ecs_cluster.arn
+  iam_role_arn                   = aws_iam_role.ecs_service_role.arn
+  task_exec_iam_role_arn         = aws_iam_role.ecs_task_execution_role.arn
+  tasks_iam_role_arn             = aws_iam_role.ecs_task_role.arn
+  enable_execute_command         = true
+  availability_zone_rebalancing  = "DISABLED"
+  ignore_task_definition_changes = false
+  create_task_exec_iam_role      = false
+  create_iam_role                = false
+  create_tasks_iam_role          = false
+  create_task_exec_policy        = false
 
   cpu                      = 256
   memory                   = 512
@@ -85,12 +89,12 @@ module "service_frontend" {
       target_group_arn = "${aws_lb_target_group.frontend_blue.arn}"
       container_name   = "${local.frontend_container.name}"
       container_port   = "${local.frontend_container.port}"
-    #   advanced_configuration = { # For Blue Green
-    #     role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
-    #     production_listener_rule   = aws_lb_listener_rule.frontend.arn
-    #     alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
-    #     test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
-    #   }
+      #   advanced_configuration = { # For Blue Green
+      #     role_arn                   = aws_iam_role.ecs_service_role.arn # ECS IAM Role with AmazonEC2ContainerServiceRole 
+      #     production_listener_rule   = aws_lb_listener_rule.frontend.arn
+      #     alternate_target_group_arn = aws_lb_target_group.frontend_green.arn
+      #     test_listener_rule         = aws_lb_listener_rule.frontend_test.arn
+      #   }
     }
   }
 
@@ -106,7 +110,7 @@ module "service_frontend" {
     #       TestEndpoint = "http://${aws_lb.load_balancer.dns_name}:8080/"
     #     })
     #   }
-    }
+  }
 
   subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   security_group_ids = [data.terraform_remote_state.vpc.outputs.security_group_ids["frontend_sg"], module.autoscaling_sg.security_group_id]

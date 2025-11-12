@@ -6,14 +6,18 @@ module "service_backend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
 
-  name                          = local.backend_container.name
-  cluster_arn                   = module.ecs_cluster.arn
-  iam_role_arn                  = aws_iam_role.ecs_service_role.arn
-  task_exec_iam_role_arn        = aws_iam_role.ecs_task_execution_role.arn
-  tasks_iam_role_arn            = aws_iam_role.ecs_task_role.arn
-  enable_execute_command        = true
-  availability_zone_rebalancing = "DISABLED"
-  ignore_task_definition_changes = true
+  name                           = "${local.backend_container.name}-${var.environment}"
+  cluster_arn                    = module.ecs_cluster.arn
+  iam_role_arn                   = aws_iam_role.ecs_service_role.arn
+  task_exec_iam_role_arn         = aws_iam_role.ecs_task_execution_role.arn
+  tasks_iam_role_arn             = aws_iam_role.ecs_task_role.arn
+  enable_execute_command         = true
+  availability_zone_rebalancing  = "DISABLED"
+  ignore_task_definition_changes = false
+  create_task_exec_iam_role      = false
+  create_iam_role                = false
+  create_tasks_iam_role          = false
+  create_task_exec_policy        = false
 
   cpu                      = 256
   memory                   = 512
@@ -33,7 +37,7 @@ module "service_backend" {
   }
 
   container_definitions = {
-    "${local.backend_container.name}" = {
+    "${local.backend_container.name}-${var.environment}" = {
       cpu       = 256
       memory    = 256
       essential = true
