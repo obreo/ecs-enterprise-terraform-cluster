@@ -6,7 +6,7 @@ module "service_backend" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "6.7.0"
 
-  name                           = "${local.backend_container.name}-${var.environment}"
+  name                           = "${local.backend_container.name}"
   cluster_arn                    = module.ecs_cluster.arn
   iam_role_arn                   = aws_iam_role.ecs_service_role.arn
   task_exec_iam_role_arn         = aws_iam_role.ecs_task_execution_role.arn
