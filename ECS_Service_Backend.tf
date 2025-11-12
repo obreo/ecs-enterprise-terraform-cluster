@@ -74,7 +74,7 @@ module "service_backend" {
         port     = local.backend_container.port
         dns_name = "${local.backend_container.name}"
       }
-      port_name      = 
+      port_name      = "http"
       discovery_name = "${local.backend_container.name}"
     }]
   }
