@@ -114,6 +114,13 @@ module "service_frontend" {
   }
 }
 
+# Outputs: <NAME>_<PARAMETER_NAME>
+output "FRONTEND_TASK_DEFINITION_NAME" {
+  value = local.frontend_container.name
+}
+output "FRONTEND_SERVICE_NAME" {
+  value = module.service_frontend.name
+}
 
 # ADDITIONAL TASK DEFINITION CONFIGS
 

@@ -86,6 +86,14 @@ module "service_backend" {
   }
 }
 
+# Outputs: <NAME>_<PARAMETER_NAME>
+output "BACKEND_TASK_DEFINITION_NAME" {
+  value = local.backend_container.name
+}
+output "BACKEND_SERVICE_NAME" {
+  value = module.service_backend.name
+}
+
 # ADDITIONAL TASK DEFINITION CONFIGS
 
 # logConfiguration = {

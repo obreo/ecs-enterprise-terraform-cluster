@@ -112,3 +112,7 @@ resource "aws_service_discovery_http_namespace" "namespace" {
   name        = "${var.cluster_name}-${var.environment}.local"
   description = "used for ${var.cluster_name}-${var.environment}.local"
 }
+
+output "CLUSTER_NAME" {
+  value = module.ecs_cluster.name
+}
