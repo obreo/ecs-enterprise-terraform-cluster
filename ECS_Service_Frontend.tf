@@ -121,7 +121,9 @@ output "FRONTEND_TASK_DEFINITION_NAME" {
 output "FRONTEND_SERVICE_NAME" {
   value = module.service_frontend.name
 }
-
+output "FRONTEND_REGISTRY" {
+  value = data.terraform_remote_state.base.outputs.frontend_aws_ecr_repository
+}
 # ADDITIONAL TASK DEFINITION CONFIGS
 
 # logConfiguration = {

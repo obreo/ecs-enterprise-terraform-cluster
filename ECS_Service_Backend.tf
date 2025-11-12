@@ -93,6 +93,9 @@ output "BACKEND_TASK_DEFINITION_NAME" {
 output "BACKEND_SERVICE_NAME" {
   value = module.service_backend.name
 }
+output "BACKEND_REGISTRY" {
+  value = data.terraform_remote_state.base.outputs.backend_aws_ecr_repository
+}
 
 # ADDITIONAL TASK DEFINITION CONFIGS
 
