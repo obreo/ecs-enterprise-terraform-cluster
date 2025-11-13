@@ -1,3 +1,46 @@
+
+module "ecs_cluster" {
+  source  = "terraform-aws-modules/ecs/aws//modules/cluster"
+  version = "6.7.0"
+
+  # Cluster 
+  name = "${var.cluster_name}-${var.environment}"
+  configuration = {
+    # Enable Container Insights - logging and monitoring
+    execute_command_configuration = {
+      logging = "OVERRIDE"
+      log_configuration = {
+        cloud_watch_log_group_name = "/aws/ecs/${var.cluster_name}"
+      }
+    }
+  }
+
+  autoscaling_capacity_providers = local.autoscaling_capacity_providers
+
+  # Cluster capacity providers
+  default_capacity_provider_strategy = local.default_capacity_provider_strategy
+
+  tags = {
+    Environment = "${var.environment}"
+    Project     = "${var.cluster_name}"
+  }
+
+  # create_task_exec_iam_role = true
+  # create_task_exec_policy   = true
+}
+
+
+resource "aws_service_discovery_http_namespace" "namespace" {
+  name        = "${var.cluster_name}-${var.environment}.local"
+  description = "used for ${var.cluster_name}-${var.environment}.local"
+}
+
+output "CLUSTER_NAME" {
+  value = module.ecs_cluster.name
+}
+
+
+
 # locals
 locals {
   # Pick launch type from variables
@@ -18,7 +61,7 @@ locals {
         managed_termination_protection = "ENABLED"
 
         managed_scaling = {
-          maximum_scaling_step_size = 5
+          maximum_scaling_step_size = 2
           minimum_scaling_step_size = 1
           status                    = "ENABLED"
           target_capacity           = 100
@@ -75,44 +118,4 @@ locals {
       base              = try(v.base, 0)
     }
   }
-}
-
-module "ecs_cluster" {
-  source  = "terraform-aws-modules/ecs/aws//modules/cluster"
-  version = "6.7.0"
-
-  # Cluster 
-  name = "${var.cluster_name}-${var.environment}"
-  configuration = {
-    # Enable Container Insights - logging and monitoring
-    execute_command_configuration = {
-      logging = "OVERRIDE"
-      log_configuration = {
-        cloud_watch_log_group_name = "/aws/ecs/${var.cluster_name}"
-      }
-    }
-  }
-
-  autoscaling_capacity_providers = local.autoscaling_capacity_providers
-
-  # Cluster capacity providers
-  default_capacity_provider_strategy = local.default_capacity_provider_strategy
-
-  tags = {
-    Environment = "${var.environment}"
-    Project     = "${var.cluster_name}"
-  }
-
-  create_task_exec_iam_role = true
-  create_task_exec_policy   = true
-}
-
-
-resource "aws_service_discovery_http_namespace" "namespace" {
-  name        = "${var.cluster_name}-${var.environment}.local"
-  description = "used for ${var.cluster_name}-${var.environment}.local"
-}
-
-output "CLUSTER_NAME" {
-  value = module.ecs_cluster.name
 }
