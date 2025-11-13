@@ -41,7 +41,7 @@ module "service_backend" {
       cpu       = 256
       memory    = 256
       essential = true
-      image = "public.ecr.aws/nginx/nginx:latest"
+      image = "161805785056.dkr.ecr.us-east-1.amazonaws.com/ecs-enterprise-backend:production-2289ede"
       portMappings = [
         {
           name          = "http"
