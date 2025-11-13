@@ -25,8 +25,8 @@ module "ecs_cluster" {
     Project     = "${var.cluster_name}"
   }
 
-  # create_task_exec_iam_role = true
-  # create_task_exec_policy   = true
+  create_task_exec_iam_role = true
+  create_task_exec_policy   = true
 }
 
 
