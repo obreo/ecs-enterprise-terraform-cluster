@@ -32,6 +32,10 @@ module "service_backend" {
   ordered_placement_strategy = {
     binpak = {
       type  = "binpack"
+      field = "memory"
+    },
+    binpak = {
+      type  = "binpack"
       field = "cpu"
     }
   }

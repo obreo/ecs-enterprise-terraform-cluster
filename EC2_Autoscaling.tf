@@ -79,7 +79,7 @@ module "autoscaling" {
   vpc_zone_identifier = data.terraform_remote_state.vpc.outputs.private_subnet_cidr_blocks
   health_check_type   = "EC2"
   min_size            = 1
-  max_size            = 5
+  max_size            = 2
   desired_capacity    = 1
 
   # https://github.com/hashicorp/terraform-provider-aws/issues/12582
