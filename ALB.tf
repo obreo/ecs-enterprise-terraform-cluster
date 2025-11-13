@@ -200,3 +200,26 @@ resource "aws_lb_listener_rule" "backend_blue" {
   ]
 }
 
+resource "aws_lb_listener_rule" "backend_health" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 3
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend_blue.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/health/*"]
+    }
+  }
+
+  # lifecycle {
+  #   ignore_changes = all
+  # }
+
+  depends_on = [
+    aws_lb.load_balancer
+  ]
+}
