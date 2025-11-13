@@ -104,6 +104,7 @@ resource "aws_iam_policy" "custom_ecs_policy" {
         ]
         Resource = [
           "arn:aws:s3:::${var.secrets_s3_bucket.enable_secrets_bucket ? var.secrets_s3_bucket.bucket_name : "no-bucket"}/secrets/*",
+          "arn:aws:s3:::${var.secrets_s3_bucket.enable_secrets_bucket ? var.secrets_s3_bucket.bucket_name : "no-bucket"}"
         ]
       },
       {

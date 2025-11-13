@@ -14,10 +14,10 @@ module "service_backend" {
   enable_execute_command         = true
   availability_zone_rebalancing  = "DISABLED"
   ignore_task_definition_changes = true
-  # create_task_exec_iam_role      = false
-  # create_iam_role                = false
-  # create_tasks_iam_role          = false
-  # create_task_exec_policy        = false
+  create_task_exec_iam_role      = false
+  create_iam_role                = false
+  create_tasks_iam_role          = false
+  create_task_exec_policy        = false
 
   cpu                      = 256
   memory                   = 512
