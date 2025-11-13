@@ -202,7 +202,7 @@ resource "aws_lb_listener_rule" "backend_blue" {
 
 resource "aws_lb_listener_rule" "backend_health" {
   listener_arn = aws_lb_listener.listener.arn
-  priority     = 3
+  priority     = 4
 
   action {
     type             = "forward"
