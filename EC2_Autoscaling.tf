@@ -6,7 +6,7 @@ locals {
   base_user_data = <<-EOT
     #!/bin/bash
     cat <<'EOF' >> /etc/ecs/ecs.config
-    ECS_CLUSTER=${var.cluster_name}
+    ECS_CLUSTER=${var.cluster_name}-${var.environment}
     ECS_LOGLEVEL=debug
     ECS_ENABLE_TASK_IAM_ROLE=true
   EOT
