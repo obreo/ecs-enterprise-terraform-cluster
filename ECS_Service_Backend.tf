@@ -67,7 +67,7 @@ module "service_backend" {
       environmentFiles = [
         {
           type  = "s3"
-          value = "arn:aws:s3:::${var.secrets_s3_bucket.bucket_name}/${var.environment}/secrets/.env"
+          value = "arn:aws:s3:::${var.secrets_s3_bucket.bucket_name}/secrets/${var.environment}/.env"
         }
       ]
 
