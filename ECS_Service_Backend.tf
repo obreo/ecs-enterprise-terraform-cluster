@@ -60,7 +60,12 @@ module "service_backend" {
       readonlyRootFilesystem                 = false
       enable_cloudwatch_logging              = true
       cloudwatch_log_group_retention_in_days = 7
-
+      environmentFiles = [
+        {
+          type  = "s3"
+          value = "arn:aws:s3:::${var.secrets_s3_bucket.bucket_name}/${var.environment}/secrets/.env"
+        }
+      ]
 
       memoryReservation = 100
       restartPolicy = {
