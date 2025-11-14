@@ -27,13 +27,16 @@ variable "loadbalancer" {
 
 variable "secrets_s3_bucket" {
   description = "S3 bucket for secrets fetching"
-  sensitive = true
+  sensitive = false
   type = object({
     enable_secrets_bucket = optional(bool, false)
     bucket_name           = optional(string, "")
   })
+  default = {
+    bucket_name = ""
+    enable_secrets_bucket = false
+  }
 }
-
 
 variable "cluster_config" {
   type = object({
@@ -50,8 +53,11 @@ variable "cluster_config" {
   }
 }
 
-# Collect Info outputs from VPC module:
 
+
+#######################################
+# Collect Info outputs from VPC module:
+#######################################
 variable "terraform_remote_outputs_vpc" {
   description = "Terraform remote state outputs configuration"
   type = object({
